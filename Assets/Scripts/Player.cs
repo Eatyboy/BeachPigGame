@@ -11,8 +11,9 @@ public class Player : MonoBehaviour
     [SerializeField] private Rigidbody rb;
     [SerializeField] private CapsuleCollider col;
     [SerializeField] private CinemachineOrbitalFollow cinemachineOrbitalFollow;
+    [SerializeField] private GameObject abilityWheel;
 
-    [Header("Parameters")]
+    [Header("Movement")]
 
     [Tooltip("The speed which the player can move in units per second")] 
     [SerializeField, Min(0.0f)] private float movementSpeed;
@@ -32,9 +33,14 @@ public class Player : MonoBehaviour
 
     private bool onGround = false;
     public Vector3 velocity;
+    
+    private const float GROUND_CHECK_DISTANCE = 0.1f;
 
-    [SerializeField] private float GROUND_CHECK_DISTANCE = 0.1f;
-    [SerializeField] private float AUTO_ROT_THRESHOLD = 10f;
+    [Header("Abilities")]
+
+    [SerializeField] private GameObject platformPrefab;
+    private bool hasSand = false;
+    private Sand currentDiggableSand = null;
 
     [ContextMenu("Recompute Constants")]
     private void InitDerivedConsts()
@@ -53,11 +59,19 @@ public class Player : MonoBehaviour
     {
         ctrl.Enable();
         ctrl.Player.Jump.performed += Jump;
+        ctrl.Player.Dig.performed += Dig;
+        ctrl.Player.Place.performed += Place;
+        ctrl.Player.AbilityWheel.performed += OpenRecipeWheel;
+        ctrl.Player.AbilityWheel.canceled += CloseRecipeWheel;
     }
 
     private void OnDisable()
     {
         ctrl.Player.Jump.performed -= Jump;
+        ctrl.Player.Dig.performed -= Dig;
+        ctrl.Player.Place.performed -= Place;
+        ctrl.Player.AbilityWheel.performed -= OpenRecipeWheel;
+        ctrl.Player.AbilityWheel.canceled -= CloseRecipeWheel;
         ctrl.Disable();
     }
 
@@ -98,11 +112,21 @@ public class Player : MonoBehaviour
         rb.linearVelocity = new(moveVel.x, rb.linearVelocity.y, moveVel.z);
     }
 
-    private void Jump(InputAction.CallbackContext ctx)
+    private void OnTriggerEnter(Collider other)
     {
-        if (!onGround) return;
+        if (other.TryGetComponent(out Sand sand))
+        {
+            currentDiggableSand = sand;
+            currentDiggableSand.Highlight();
+        }
+    }
 
-        rb.linearVelocity = new(rb.linearVelocity.x, jumpSpeed, rb.linearVelocity.z);
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.TryGetComponent(out Sand sand) && sand == currentDiggableSand)
+        {
+            currentDiggableSand = null;
+        }
     }
 
     private void CheckGrounded()
@@ -110,5 +134,37 @@ public class Player : MonoBehaviour
         Vector3 origin = transform.TransformPoint(col.center) 
             + (col.radius - 0.01f) * Vector3.down;
         onGround = Physics.Raycast(origin, Vector3.down, out RaycastHit hit, GROUND_CHECK_DISTANCE);
+    }
+
+    private void Jump(InputAction.CallbackContext ctx)
+    {
+        if (!onGround) return;
+
+        rb.linearVelocity = new(rb.linearVelocity.x, jumpSpeed, rb.linearVelocity.z);
+    }
+
+    private void Place(InputAction.CallbackContext ctx)
+    {
+
+    }
+
+    private void Dig(InputAction.CallbackContext ctx)
+    {
+        if (currentDiggableSand != null)
+        {
+            currentDiggableSand.Dig();
+            currentDiggableSand = null;
+            hasSand = true;
+        }
+    }
+
+    private void OpenRecipeWheel(InputAction.CallbackContext ctx)
+    {
+
+    }
+
+    private void CloseRecipeWheel(InputAction.CallbackContext ctx)
+    {
+
     }
 } 

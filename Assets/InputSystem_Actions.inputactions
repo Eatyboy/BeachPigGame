@@ -24,18 +24,36 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Interact",
+                    "name": "Jump",
                     "type": "Button",
-                    "id": "7023188a-95a6-45d9-981a-788eb11913ed",
+                    "id": "e68a5627-bb0c-4be1-85d1-e25b8f38b3d3",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Jump",
+                    "name": "Dig",
                     "type": "Button",
-                    "id": "e68a5627-bb0c-4be1-85d1-e25b8f38b3d3",
+                    "id": "8d6cefdd-99c7-40b6-9b96-08289b417b5c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AbilityWheel",
+                    "type": "Button",
+                    "id": "1f3c0b4d-78f7-4813-8a4c-147f79084e3d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Hold",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Place",
+                    "type": "Button",
+                    "id": "2a858cf6-d3fb-4e1d-81e9-94942823adc2",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -210,23 +228,45 @@
                 },
                 {
                     "name": "",
-                    "id": "f91d13c3-5e17-4d0c-b0a0-35a8013ddd7c",
-                    "path": "<Keyboard>/e",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Interact",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "ee93ea6b-5560-4789-b088-85966fcf0750",
                     "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5bcc771d-892e-46d3-a4d2-c4d634429ecb",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Dig",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ea0a54f6-1464-46e7-aec8-36f846136e24",
+                    "path": "<Keyboard>/q",
+                    "interactions": "Hold",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AbilityWheel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7d9339a9-ef6e-427a-bc0a-24441620efb9",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Place",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
