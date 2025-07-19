@@ -11,7 +11,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Rigidbody rb;
     [SerializeField] private CapsuleCollider col;
     [SerializeField] private CinemachineOrbitalFollow cinemachineOrbitalFollow;
-    [SerializeField] private GameObject abilityWheel;
+    [SerializeField] private AbilityWheel abilityWheel;
 
     [Header("Movement")]
 
@@ -114,17 +114,18 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent(out Sand sand))
+        if (other.CompareTag("Sand") && other.TryGetComponent(out Sand sand))
         {
             currentDiggableSand = sand;
-            currentDiggableSand.Highlight();
+            currentDiggableSand.EnableHighlight();
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.TryGetComponent(out Sand sand) && sand == currentDiggableSand)
+        if (other.CompareTag("Sand") && other.TryGetComponent(out Sand sand) && sand == currentDiggableSand)
         {
+            currentDiggableSand.DisableHighlight();
             currentDiggableSand = null;
         }
     }
@@ -150,7 +151,7 @@ public class Player : MonoBehaviour
 
     private void Dig(InputAction.CallbackContext ctx)
     {
-        if (currentDiggableSand != null)
+        if (currentDiggableSand != null && currentDiggableSand.isFull)
         {
             currentDiggableSand.Dig();
             currentDiggableSand = null;
@@ -160,11 +161,11 @@ public class Player : MonoBehaviour
 
     private void OpenRecipeWheel(InputAction.CallbackContext ctx)
     {
-
+        abilityWheel.Open();
     }
 
     private void CloseRecipeWheel(InputAction.CallbackContext ctx)
     {
-
+        abilityWheel.Close();
     }
 } 
