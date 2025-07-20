@@ -8,8 +8,7 @@ public class Player : MonoBehaviour
     [Header("References")]
     private InputSystem_Actions ctrl;
 
-    [SerializeField] private Rigidbody rb;
-    [SerializeField] private CapsuleCollider col;
+    [SerializeField] private CharacterController controller;
     [SerializeField] private CinemachineOrbitalFollow cinemachineOrbitalFollow;
     [SerializeField] private AbilityWheel abilityWheel;
 
@@ -31,8 +30,8 @@ public class Player : MonoBehaviour
     [Tooltip("The maximum velocity by which the player can fall")] 
     [SerializeField, Min(0.0f)] private float terminalVelocity;
 
-    private bool onGround = false;
     public Vector3 velocity;
+    private bool onGround;
     
     private const float GROUND_CHECK_DISTANCE = 0.1f;
 
@@ -51,6 +50,9 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         ctrl = new();
+
+        velocity = Vector3.zero;
+        onGround = false;
 
         InitDerivedConsts();
     }
@@ -86,14 +88,7 @@ public class Player : MonoBehaviour
         float fdt = Time.fixedDeltaTime;
 
         Vector2 moveInput = ctrl.Player.Move.ReadValue<Vector2>();
-
-        CheckGrounded();
-        // Fall
-        if (!onGround)
-        {
-            float newYVel = Mathf.Max(rb.linearVelocity.y - gravity * fdt, -terminalVelocity);
-            rb.linearVelocity = new(rb.linearVelocity.x, newYVel, rb.linearVelocity.z);
-        }
+        onGround = IsGrounded();
 
         float camYaw = cinemachineOrbitalFollow.HorizontalAxis.Value;
         Vector3 camFwd = new(Mathf.Sin(camYaw * Mathf.Deg2Rad), 0.0f, Mathf.Cos(camYaw * Mathf.Deg2Rad));
@@ -107,9 +102,27 @@ public class Player : MonoBehaviour
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, turnRate * fdt);
         }
 
-        Vector3 moveVel = moveMagnitude * movementSpeed * transform.forward;
+        Vector3 movement = moveMagnitude * movementSpeed * fdt * transform.forward;
+        // Fall
+        if (onGround)
+        {
+            velocity.y = Mathf.Max(0.0f, velocity.y);
+        }
+        else
+        {
+            velocity.y = Mathf.Max(velocity.y - gravity * fdt, -terminalVelocity);
+        }
+        movement += velocity.y * fdt * Vector3.up;
+        
+        controller.Move(movement);
 
-        rb.linearVelocity = new(moveVel.x, rb.linearVelocity.y, moveVel.z);
+        velocity.x = controller.velocity.x;
+        velocity.z = controller.velocity.z;
+    }
+
+    private bool IsGrounded()
+    {
+        return Physics.SphereCast(transform.position, controller.radius, Vector3.down, out RaycastHit hitInfo, GROUND_CHECK_DISTANCE);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -130,18 +143,11 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void CheckGrounded()
-    {
-        Vector3 origin = transform.TransformPoint(col.center) 
-            + (col.radius - 0.01f) * Vector3.down;
-        onGround = Physics.Raycast(origin, Vector3.down, out RaycastHit hit, GROUND_CHECK_DISTANCE);
-    }
-
     private void Jump(InputAction.CallbackContext ctx)
     {
         if (!onGround) return;
 
-        rb.linearVelocity = new(rb.linearVelocity.x, jumpSpeed, rb.linearVelocity.z);
+        velocity.y = jumpSpeed;
     }
 
     private void Place(InputAction.CallbackContext ctx)
