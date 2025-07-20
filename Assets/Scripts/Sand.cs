@@ -3,14 +3,11 @@ using UnityEngine;
 public class Sand : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private MeshFilter filter;
-    [SerializeField] private MeshRenderer renderer;
+    [SerializeField] private MeshRenderer meshRenderer;
 
     [Header("Params")]
-    [SerializeField] private Mesh fullMesh;
-    [SerializeField] private Mesh dugMesh;
-    [SerializeField] private Material fullMaterial;
-    [SerializeField] private Material dugMaterial;
+    [SerializeField] private GameObject fullSand;
+    [SerializeField] private GameObject dugSand;
     [SerializeField, Range(0.0f, 1.0f)] private float highlightDarkenFactor = 1.0f;
 
     [Header("State")]
@@ -25,16 +22,16 @@ public class Sand : MonoBehaviour
     public void Dig()
     {
         isFull = false;
-        filter.mesh = dugMesh;
-        renderer.material = dugMaterial;
+        fullSand.SetActive(false);
+        dugSand.SetActive(true);
         Debug.Log($"{gameObject.name} was dug");
     }
 
     public void Fill()
     {
         isFull = true;
-        filter.mesh = fullMesh;
-        renderer.material = fullMaterial;
+        fullSand.SetActive(true);
+        dugSand.SetActive(false);
         Debug.Log($"{gameObject.name} was filled");
     }
 
@@ -42,7 +39,7 @@ public class Sand : MonoBehaviour
     {
         if (!isHighlighted)
         {
-            renderer.material.color *= highlightDarkenFactor;
+            meshRenderer.material.color *= highlightDarkenFactor;
             isHighlighted = true;
         }
     }
@@ -51,7 +48,7 @@ public class Sand : MonoBehaviour
     {
         if (isHighlighted)
         {
-            renderer.material.color /= highlightDarkenFactor;
+            meshRenderer.material.color /= highlightDarkenFactor;
             isHighlighted = false;
         }
     }
